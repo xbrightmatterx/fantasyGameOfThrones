@@ -55,7 +55,8 @@ describe('Auth Controller', function () {
 });
 
 describe('League Controller', function () {
-
+  var id, id2; // stored via insert new league,
+          // used in update league name test
   it('Should insert a new league into the DB', function (done) {
 
     leagueControls.addLeague({name: 'targaryan', user_id: 1})
@@ -63,33 +64,50 @@ describe('League Controller', function () {
 
         leagueControls.findLeague({name: 'targaryan'})
           .then(function (league) {
+            id = league[0].league_id;
             expect(league[0].name).to.equal('targaryan');
             done();
-          })
-          .catch(function (err) {
-            console.error('error in new league test: ', err);
-            done(err);
           });
+      })
+      .catch(function (err) {
+        console.error('error in new league test: ', err);
+        done(err);
       });
   });
 
-  it('Should update league with a different user_id', function (done) {
-
+  it('Should update league with a different user_id (different moderator)', function (done) {
+    // add new user, then update existing league with new user_id
+    authControls.addNewUser(users[1])
+      .then(function (results) {
+        id2 = results.insertId;
+        leagueControls.updateLeague({user_id: id2}, 'targaryan')
+          .then(function (results) {
+            leagueControls.findLeague({name: 'targaryan'})
+              .then(function (league) {
+                //verify user_id was updated
+                expect(league[0].user_id).to.equal(id2);
+                done();
+              });
+          });
+      })
+      .catch(function (err) {
+        console.error('something wrong updating league with user_id test: ', err);
+      });
   });
 
   it('Should update league name', function (done) {
-    leagueControls.updateLeague({name: 'targaryan', newName: 'johnsnow'})
+    leagueControls.updateLeague({name: 'johnsnow'}, 'targaryan')
       .then(function (results) {
         leagueControls.findLeague({name: 'johnsnow'})
           .then(function (league) {
             // check for same id as original league stored
-            expect(league[0].league_id).to.equal(1);
+            expect(league[0].league_id).to.equal(id);
             done();
-          })
-          .catch(function (err) {
-            console.error('something wrong updating league name: ', err);
-            done(err);
           });
+      })
+      .catch(function (err) {
+        console.error('something wrong updating league name: ', err);
+        done(err);
       });
   });
 
@@ -98,22 +116,81 @@ describe('League Controller', function () {
 describe('User Controller', function () {
 
   it('Should update users league', function (done) {
-    
+    // find userID, store it
+    // find league
+    //check if mod exists
+      // if yes, store it in a var oldMod
+      //update league with new userID
+      // update user with isMod true
+      // update oldMod with isMod false
+    // verify oldMod is no longer the mod
+    // verify user isMod (is there a way to check as you update?)
+  });
+
+  it('Should delete a user ', function (done) {
+    // add user
+    authControls.addNewUser(users[2])
+      .then(function (results) {
+        //delete user
+        authControls.findUser({username: users[2].username})
+          .then(function (user) {
+            expect(user.length).to.equal(1);
+          });
+          userControls.deleteUser(users[2])
+            .then(function (user) {
+              authControls.findUser({username: users[2].username})
+                .then(function (users) {
+                  // if no items in array of results, user was deleted
+                  expect(users.length).to.equal(0);
+                  done();
+                });
+            });
+      })
+      .catch(function (err) {
+        console.error('error in delete user test: ', err);
+        done(err);
+      });
   });
 
 });
 
+var characters = [
+  {
+    name: 'gary',
+    house: 'afraternity',
+    image: 'http://www.gameofthrones.com'
+  }
+];
 
-describe('Events Controller', function () {
-  it('Should insert a new event into the DB', function (done) {
+var events = [
+  {
+    type: 'death',
+    description: 'gary gets his head chopped off',
+    episode: 4,
+    season: 6,
+    char_id: 1,
+    points: 100
+  }
+];
 
-  });
-
-});
-
-describe('Characters Controller', function () {
+xdescribe('Characters Controller', function () {
   it('Should insert a new character into the DB', function (done) {
 
   });
 
 });
+
+xdescribe('Events Controller', function () {
+  it('Should insert a new event into the DB', function (done) {
+    eventControls.addEvent(events[0])
+      .then(function (results) {
+        done();
+      })
+      .catch(function (err) {
+        console.error('error in inserting event test: ', err);
+        done();
+      });
+  });
+
+});
+
