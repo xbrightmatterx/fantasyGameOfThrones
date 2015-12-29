@@ -11,10 +11,10 @@ exports.addLeague = function (data) {
   return connection.queryAsync(sql);
 };
 
-exports.updateLeague = function (data) {
+exports.updateLeague = function (data, name) {
   // update name, data object's 'newName' param holds the updated name
   var sql = mysql.format('UPDATE leagues SET ? WHERE name = ?', 
-                    [{ name : data.newName }, data.name]);
+                    [data, name]);
   return connection.queryAsync(sql);
 };
 
