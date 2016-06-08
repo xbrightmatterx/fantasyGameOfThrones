@@ -20,7 +20,7 @@ var issueToken = function(req, res, next) {
   var id = res.body.user.id;
 
   //TODO: include token expiration
-  var token = jwt.encode({iss: id}, 'areallybigsecret');
+  var token = jwt.encode({iss: id}, 'areallybigsecret'); // move secret into auth file
   res.body.token = token;
   res.status(200).json(res.body);
 };

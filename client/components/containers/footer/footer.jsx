@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import './footer.less';
+// import './footer.less';
 
 class Footer extends Component {
 

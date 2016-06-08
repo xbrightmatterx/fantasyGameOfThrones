@@ -5,7 +5,76 @@ import actions from './../../../services/actionConstants.jsx'
 import './trade.less';
 
 class Trade extends Component {
-  // dispatch each time a character is clicked, update the state
+
+  render() {
+  
+    const {dispatch, tradeDisplay} = this.props;
+    const {undrafted, userRoster, droppedHistory} = this.data(); // Build three types of rosters
+
+    const buildDropHistory = (histArr, droppedFor) => {
+      let name = 'name', image = 'imageUrl';
+      if (droppedFor) {
+        name = 'droppedName';
+        image = 'droppedImg';
+      }
+      return histArr.map((char, i) => {
+        var key = i;
+        if (i < 8) {
+          return (
+            <li key={key}>
+              <div>{char[name]}</div>
+                <img className="thumb" src={char[image]}></img>
+            </li>
+          ); 
+        }  
+      }).filter((character) => {
+        return character !== undefined;
+      })
+    };
+
+    const buildTradeView = (roster, action) => {
+      return roster.map((char) => {
+        return (
+          <li key={char.id}>
+            <div>{char.name}</div>
+            <button onClick={() => this.props.dispatch(actions.changeTradeChar(char.id, action))}>
+              <img className="thumb" src={char.imageUrl}></img>
+            </button>
+          </li>
+        );
+      });
+    };
+    
+    return (
+      <div>
+        <h1>Trade Stuff</h1>
+        <button onClick={() => this.props.dispatch(actions.initiateTrade(tradeDisplay, this.props.currentEpisode))}>
+          Submit Trade
+        </button>
+        <ul>
+        <h2> YOUR ROSTER </h2>
+          {buildTradeView(userRoster, 'DROP')}
+        </ul>
+
+        <ul>
+        <h2>UNDRAFTED</h2>
+          {buildTradeView(undrafted, 'ADD')}
+        </ul> 
+        <h2>TRADE HISTORY</h2>
+
+        <ul>
+        <h3>Dropped:</h3>
+          {buildDropHistory(droppedHistory)}
+        </ul> 
+
+        <ul>
+        <h3>For:</h3>
+          {buildDropHistory(droppedHistory, true)}
+        </ul>
+
+      </div>
+    );
+  }
 
   //used to populate droppedHistory array (it may have duplicates so we iterate)
   createCharsWithImages(char, arr) {
@@ -103,76 +172,6 @@ class Trade extends Component {
 
     return {undrafted, userRoster, droppedHistory};
 
-  }
-
-  render() {
-  
-    const {dispatch, tradeDisplay} = this.props;
-    let {undrafted, userRoster, droppedHistory} = this.data();
-
-    const buildDropHistory = (histArr, droppedFor) => {
-      let name = 'name', image = 'imageUrl';
-      if (droppedFor) {
-        name = 'droppedName';
-        image = 'droppedImg';
-      }
-      return histArr.map((char, i) => {
-        var key = i;
-        if (i < 8) {
-          return (
-            <li key={key}>
-              <div>{char[name]}</div>
-                <img className="thumb" src={char[image]}></img>
-            </li>
-          ); 
-        }  
-      }).filter((character) => {
-        return character !== undefined;
-      })
-    };
-
-    const buildTradeView = (roster, action) => {
-      return roster.map((char) => {
-        return (
-          <li key={char.id}>
-            <div>{char.name}</div>
-            <button onClick={() => this.props.dispatch(actions.changeTradeChar(char.id, action))}>
-              <img className="thumb" src={char.imageUrl}></img>
-            </button>
-          </li>
-        );
-      });
-    };
-    
-    return (
-      <div>
-        <h1>Trade Stuff</h1>
-        <button onClick={() => this.props.dispatch(actions.initiateTrade(tradeDisplay, this.props.currentEpisode))}>
-          Submit Trade
-        </button>
-        <ul>
-        <h2> YOUR ROSTER </h2>
-          {buildTradeView(userRoster, 'DROP')}
-        </ul>
-
-        <ul>
-        <h2>UNDRAFTED</h2>
-          {buildTradeView(undrafted, 'ADD')}
-        </ul> 
-        <h2>TRADE HISTORY</h2>
-
-        <ul>
-        <h3>Dropped:</h3>
-          {buildDropHistory(droppedHistory)}
-        </ul> 
-
-        <ul>
-        <h3>For:</h3>
-          {buildDropHistory(droppedHistory, true)}
-        </ul>
-
-      </div>
-    );
   }
 }
 

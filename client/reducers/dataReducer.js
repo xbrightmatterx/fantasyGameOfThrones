@@ -77,7 +77,7 @@ const auth = (state = {token: '', self: {}}, action) => {
     case constants.ROSTER_UPDATED:
       let stateCpy = Object.assign({}, state);
       stateCpy.self.roster = action.payload;
-      return Object.assign({}, stateCpy);
+      return stateCpy;
 
     case constants.LEAVE_LEAGUE_SUCCESS:
       return Object.assign({}, state, {self: action.payload.user});
